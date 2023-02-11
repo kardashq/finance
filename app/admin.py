@@ -1,19 +1,12 @@
 from django.contrib import admin
 
-from models import (Customer, Account,
-                    Category, Transaction)
-
-
-@admin.register(Customer)
-class CustomerAdmin(admin.ModelAdmin):
-    """Register Customer Model in AdminPanel"""
-    list_display = ['first_name', 'last_name']
+from .models import Account, Category, Transaction
 
 
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
     """Register Account Model in AdminPanel"""
-    list_display = ['balance', 'moneybox']
+    list_display = ['user', 'first_name', 'last_name', 'balance']
 
 
 @admin.register(Category)

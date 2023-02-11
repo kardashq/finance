@@ -5,7 +5,7 @@ from django.db import models
 from django.conf import settings
 
 
-def customer_image_file_path(filename):
+def customer_image_file_path(instande, filename):
     """Generate file path for new image"""
     ext = filename.split('.')[-1]
     filename = f'{uuid.uuid4()}.{ext}'
@@ -13,42 +13,29 @@ def customer_image_file_path(filename):
     return os.path.join('upload/customer/', filename)
 
 
-class Customer(models.Model):
+class Account(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
-    house = models.CharField(max_length=255)
     image = models.ImageField(null=True, upload_to=customer_image_file_path)
 
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-    )
-
-    def __str__(self):
-        return f'{self.first_name} {self.last_name}'
-
-
-class Account(models.Model):
     balance = models.DecimalField(
         default=0,
         max_digits=12,
         decimal_places=2
     )
 
-    moneybox = models.DecimalField(
-        default=0,
-        max_digits=12,
-        decimal_places=2
-    )
-
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT  # we cannot delete user with balance
+        on_delete=models.CASCADE,
     )
 
+    class Meta:
+        verbose_name = 'Account'
+        verbose_name_plural = 'Accounts'
+
     def __str__(self):
-        return f'{self.id} of {self.user.username}'
+        return f'{self.first_name} {self.last_name}'
 
 
 class Category(models.Model):
@@ -63,7 +50,7 @@ class Category(models.Model):
 
 
 class Transaction(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.DO_NOTHING)
+    category = models.ForeignKey(Category, on_delete=models.PROTECT)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateTimeField(auto_now_add=True)
     TRANSACTION_TYPE_CHOICES = (
