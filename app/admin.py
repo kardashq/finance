@@ -5,6 +5,7 @@ from models import (Customer, Account,
 
 
 @admin.register(Customer)
+"""Register CustomerModel in admin"""
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ['first_name', 'last_name']
 
