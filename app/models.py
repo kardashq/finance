@@ -5,7 +5,7 @@ from django.db import models
 from django.conf import settings
 
 
-def customer_image_file_path(instande, filename):
+def customer_image_file_path(instanse, filename):
     """Generate file path for new image"""
     ext = filename.split('.')[-1]
     filename = f'{uuid.uuid4()}.{ext}'
@@ -18,13 +18,11 @@ class Account(models.Model):
     last_name = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     image = models.ImageField(null=True, upload_to=customer_image_file_path)
-
     balance = models.DecimalField(
         default=0,
         max_digits=12,
         decimal_places=2
     )
-
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -52,10 +50,11 @@ class Category(models.Model):
 class Transaction(models.Model):
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.CharField(max_length=255, null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True)
     TRANSACTION_TYPE_CHOICES = (
-        ('income', 'Income'),
-        ('expense', 'Expense'),
+        ('income', 'Доход'),
+        ('expense', 'Расход'),
     )
 
     type_of_transaction = models.CharField(
@@ -63,10 +62,11 @@ class Transaction(models.Model):
         max_length=8
     )
 
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.DO_NOTHING
+    account = models.ForeignKey(
+        Account,
+        on_delete=models.CASCADE,
+        related_name='actions',
     )
 
     def __str__(self):
-        return f'{self.amount} - {self.user}'
+        return f'{self.amount} - {self.account}'

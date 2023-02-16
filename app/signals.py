@@ -6,7 +6,7 @@ from .models import Account
 
 @receiver(user_registered, dispatch_uid="create_account")
 def create_account(sender, user, request, **kwargs):
-    """Создаём профиль пользователя при регистрации"""
+    """Signal to create an account upon registration"""
     data = request.data
 
     Account.objects.create(
