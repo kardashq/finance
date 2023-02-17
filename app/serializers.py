@@ -4,7 +4,7 @@ from .models import Transaction, Account
 
 
 class TransactionSerializer(serializers.ModelSerializer):
-    """Вывод всех операций"""
+    """All transaction for """
     category = serializers.SlugRelatedField(slug_field='title', read_only=True)
 
     class Meta:
@@ -13,22 +13,23 @@ class TransactionSerializer(serializers.ModelSerializer):
 
 
 class AccountSerializer(serializers.ModelSerializer):
-    """Вывод данных аккаунта"""
+    """Account details"""
 
     class Meta:
         model = Account
         fields = ('__all__')
-        #exclude = ('user',)
+        # exclude = ('user',)
 
 
 class ActionSerializer(serializers.ModelSerializer):
-
+    """Serializer for CRUD transactions"""
     class Meta:
         model = Transaction
-        fields = ('id', 'account', 'category', 'amount', 'description', 'type_of_transaction', 'date')
-        read_only_fields = ('id', 'date', 'account')
+        fields = ('id',  'category', 'amount', 'description', 'type_of_transaction', 'date')
+        read_only_fields = ('id', 'date')
 
     def create(self, validated_data):
+        """Create new transaction"""
         print(validated_data)
         if validated_data['type_of_transaction'] == 'income':
             validated_data['account'].balance += validated_data['amount']
