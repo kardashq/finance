@@ -1,14 +1,22 @@
+from datetime import datetime, timedelta
+
+from django.db.models import Sum
 from django.http import HttpResponse
-from openpyxl import Workbook
-from openpyxl.utils import get_column_letter
 from rest_framework import generics, viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
 
 from .models import Transaction, Account
 from .serializers import AccountSerializer, ActionSerializer, TransactionSerializer
+
+
+class MyPageNumberPagination(LimitOffsetPagination):
+    default_limit = 5
 
 
 class TransactionsAPIView(generics.ListAPIView):
@@ -17,10 +25,10 @@ class TransactionsAPIView(generics.ListAPIView):
     authentication_classes = (TokenAuthentication,)
     serializer_class = TransactionSerializer
     permission_classes = (IsAuthenticated,)
+    pagination_class = MyPageNumberPagination
 
     def get_queryset(self):
         """Return object for current authenticated user only"""
-        print(self.request.user)
         return self.queryset.filter(account__user=self.request.user)
 
 
@@ -46,6 +54,7 @@ class ActionViewSet(viewsets.GenericViewSet,
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
     queryset = Transaction.objects.all()
+    pagination_class = MyPageNumberPagination
 
     def perform_create(self, serializer):
         """Create new transaction"""
@@ -95,3 +104,40 @@ class ExportTransactionsView(APIView):
         wb.save(response)
 
         return response
+
+
+class MonthlyStatsView(generics.ListAPIView):
+    """Get monthly statistics on expenses for auth user only.
+     Need query_params month, year and type of transaction[t](optional)"""
+    serializer_class = TransactionSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    pagination_class = MyPageNumberPagination
+
+    def get_queryset(self):
+        # Get the month and year from the query
+        month = self.request.query_params.get('month')
+        year = self.request.query_params.get('year')
+        t = self.request.query_params.get('t', None)
+
+        # start and end date of the month
+        start_date = datetime(int(year), int(month), 1)
+        end_date = start_date.replace(month=start_date.month + 1, day=1) - timedelta(days=1)
+
+        if t:
+            # Get monthly statistics selected type "income" or "expense"
+            stats = Transaction.objects.filter(
+                account__user=self.request.user,
+                type_of_transaction=t,
+                date__range=[start_date, end_date]
+            ).annotate(total=Sum('amount'))
+
+            return stats
+        else:
+            # Get monthly statistics
+            stats = Transaction.objects.filter(
+                account__user=self.request.user,
+                date__range=[start_date, end_date]
+            ).annotate(total=Sum('amount'))
+
+            return stats

@@ -18,4 +18,4 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
     """Register Transaction Model in AdminPanel"""
-    list_display = ['type_of_transaction', 'account', 'category', 'amount', 'date']
+    list_display = ['account', 'category', 'type_of_transaction', 'amount', 'date']

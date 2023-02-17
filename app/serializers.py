@@ -9,23 +9,24 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Transaction
-        fields = ('id', 'category', 'amount', 'type_of_transaction',)
+        fields = ('id', 'category', 'amount', 'type_of_transaction', 'date',)
 
 
 class AccountSerializer(serializers.ModelSerializer):
     """Account details"""
+    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
         model = Account
-        fields = ('__all__')
-        # exclude = ('user',)
+        fields = '__all__'
 
 
 class ActionSerializer(serializers.ModelSerializer):
-    """Serializer for CRUD transactions"""
+    """Serializer for CRUD operations with transactions"""
+
     class Meta:
         model = Transaction
-        fields = ('id',  'category', 'amount', 'description', 'type_of_transaction', 'date')
+        fields = ('id', 'category', 'amount', 'description', 'type_of_transaction', 'date')
         read_only_fields = ('id', 'date')
 
     def create(self, validated_data):
