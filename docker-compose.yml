@@ -8,7 +8,7 @@ services:
       - POSTGRES_DB=finance_db
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-  finance_web:
+  web:
     build: .
     command:  bash -c "python /usr/src/finance/manage.py migrate --noinput &&
               python /usr/src/finance/manage.py runserver 0.0.0.0:8000"
