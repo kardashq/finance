@@ -26,6 +26,7 @@ class Account(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        related_name='user',
     )
 
     class Meta:
@@ -59,14 +60,17 @@ class Transaction(models.Model):
 
     type_of_transaction = models.CharField(
         choices=TRANSACTION_TYPE_CHOICES,
-        max_length=8
+        max_length=7
     )
 
     account = models.ForeignKey(
         Account,
         on_delete=models.CASCADE,
-        related_name='actions',
     )
 
+    class Meta:
+        verbose_name = 'Transaction'
+        verbose_name_plural = 'Transactions'
+
     def __str__(self):
-        return f'{self.amount} - {self.account}'
+        return f'{self.amount} - {self.type_of_transaction} - {self.account}'
