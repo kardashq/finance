@@ -1,0 +1,25 @@
+version: '3.7'
+services:
+  finance_db:
+    image: postgres:15.2
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=finance_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+  finance_web:
+    build: .
+    command:  bash -c "python /usr/src/finance/manage.py migrate --noinput &&
+              python /usr/src/finance/manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/usr/src/finance
+    ports:
+      - 8000:8000
+    env_file:
+      - ./.env
+    depends_on:
+      - finance_db
+
+volumes:
+  postgres_data:

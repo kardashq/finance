@@ -101,7 +101,7 @@ DATABASES = {
         'NAME': 'finance_db',
         'USER' : 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': 'localhost',
+        'HOST': 'finance_db',
         'PORT': '5432',
     }
 }

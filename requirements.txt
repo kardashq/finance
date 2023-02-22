@@ -1,0 +1,8 @@
+djangorestframework
+Django
+Pillow
+drf-yasg
+Djoser
+psycopg2
+python-dotenv
+openpyxl
