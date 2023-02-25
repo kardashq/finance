@@ -7,7 +7,7 @@ schema_view = get_schema_view(
     openapi.Info(
         title="Finance",
         default_version='v1',
-        description="Test description",
+        description="Api for personal accounting",
         license=openapi.License(name="MIT License"),
     ),
     public=True,

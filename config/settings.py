@@ -99,8 +99,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'finance_db',
-        'USER' : 'postgres',
-        'PASSWORD': 'postgres',
+        'USER': os.getenv('DB_USER'),  # .env
+        'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': 'finance_db',
         'PORT': '5432',
     }
@@ -148,9 +148,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.CustomUser'
 
 REST_FRAMEWORK = {
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.IsAuthenticated'
-    # ],
     'DATETIME_FORMAT': "%d.%m.%Y %H:%M:%S",
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
