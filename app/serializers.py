@@ -26,8 +26,8 @@ class ActionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Transaction
-        fields = ('id', 'category', 'amount', 'description', 'type_of_transaction', 'date')
-        read_only_fields = ('id', 'date')
+        fields = ('id', 'category', 'amount', 'description', 'type_of_transaction', 'date', 'account')
+        read_only_fields = ('id', 'date', 'account')
 
     def create(self, validated_data):
         """Create new transaction"""

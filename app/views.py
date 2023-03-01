@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
+from openpyxl.styles import Font
 
 from .models import Transaction, Account
 from .serializers import AccountSerializer, ActionSerializer, TransactionSerializer
@@ -81,20 +82,21 @@ class ExportTransactionsView(APIView):
 
         # headers settings
         headers = [
-            'ID', 'Описание', 'Категория', 'Сумма', 'Тип', 'Баланс'
+            'Дата', 'Категория', 'Сумма', 'Описание', 'Тип', 'Баланс'
         ]
         for idx, header in enumerate(headers):
             column = get_column_letter(idx + 1)
             ws.column_dimensions[column].width = 20
             ws[f'{column}1'] = header
+            ws[f'{column}1'].font = Font(bold=True)
 
         # Filling the table with data
         for idx, transaction in enumerate(transactions):
             row = idx + 2
-            ws[f'A{row}'] = transaction.id
-            ws[f'B{row}'] = transaction.description
-            ws[f'C{row}'] = transaction.category.title
-            ws[f'D{row}'] = transaction.amount
+            ws[f'A{row}'] = transaction.date
+            ws[f'B{row}'] = transaction.category.title
+            ws[f'C{row}'] = transaction.amount
+            ws[f'D{row}'] = transaction.description
             ws[f'E{row}'] = 'Доход' if transaction.type_of_transaction == 'income' else 'Расход'
         ws[f'F2'] = transactions[0].account.balance
 
@@ -141,3 +143,55 @@ class MonthlyStatsView(generics.ListAPIView):
             ).annotate(total=Sum('amount'))
 
             return stats
+
+
+class MonthlyExportTransactionsView(APIView):
+    """For download Excel account statistics"""
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        month = self.request.query_params.get('month')
+        year = self.request.query_params.get('year')
+        t = self.request.query_params.get('t', None)
+        user = request.user
+        start_date = datetime(int(year), int(month), 1)
+        end_date = start_date.replace(month=start_date.month + 1, day=1) - timedelta(days=1)
+        if t:
+            transactions = Transaction.objects.filter(account__user=self.request.user,
+                                                      type_of_transaction=t,
+                                                      date__range=[start_date, end_date])
+        else:
+            transactions = Transaction.objects.filter(account__user=self.request.user,
+                                                      date__range=[start_date, end_date])
+
+        # Create new workbook and get the active sheet
+        wb = Workbook()
+        ws = wb.active
+
+        # headers settings
+        headers = [
+            'Дата', 'Категория', 'Сумма', 'Описание', 'Тип', 'Баланс'
+        ]
+        for idx, header in enumerate(headers):
+            column = get_column_letter(idx + 1)
+            ws.column_dimensions[column].width = 20
+            ws[f'{column}1'] = header
+            ws[f'{column}1'].font = Font(bold=True)
+
+        # Filling the table with data
+        for idx, transaction in enumerate(transactions):
+            row = idx + 2
+            ws[f'A{row}'] = transaction.date
+            ws[f'B{row}'] = transaction.category.title
+            ws[f'C{row}'] = transaction.amount
+            ws[f'D{row}'] = transaction.description
+            ws[f'E{row}'] = 'Доход' if transaction.type_of_transaction == 'income' else 'Расход'
+            ws[f'F2'] = transactions[0].account.balance
+
+        # Preparing an HTTP-response with the created Excel file
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = f'attachment; filename={user.username}-{month}-{year}transactions.xlsx'
+        wb.save(response)
+
+        return response
