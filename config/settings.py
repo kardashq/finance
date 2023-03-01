@@ -101,7 +101,7 @@ DATABASES = {
         'NAME': 'finance_db',
         'USER': os.getenv('DB_USER'),  # .env
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': 'finance_db',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
@@ -160,6 +160,7 @@ DJOSER = {
     'SEND_ACTIVATION_EMAIL': True,
     'SET_PASSWORD_RETYPE': True,
     'PASSWORD_RESET_CONFIRM_RETYPE': True,
+    'PASSWORD_RESET_CONFIRM_URL': '/password/reset/confirm/{uid}/{token}',
     'ACTIVATION_URL': 'auth/verify/{uid}/{token}/',
 }
 
