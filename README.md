@@ -1,6 +1,6 @@
 ## Getting started
 
-This project has been made only for study porpouses, it allows you to administrate budgets for each category of your expenses, manage your accounts and so on.
+This project has been made only for study purposes, it allows you to administrate budgets for each category of your expenses, manage your accounts and so on.
 
 It uses docker for local usage and local development. 
 
