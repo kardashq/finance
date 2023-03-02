@@ -1,16 +1,12 @@
-import requests
 from django.test import TestCase
-from psycopg2._psycopg import Decimal
 from rest_framework import status
 from django.urls import reverse
-from rest_framework.test import APIClient, APIRequestFactory
+from rest_framework.test import APIClient
 from rest_framework.authtoken.models import Token
 
-from app.views import ActionViewSet
 from users.models import CustomUser
-from app.models import Category, Account
 
-ACTION_URL = reverse('api:action-list')
+ACTION_URL = reverse('api:transaction-list')
 STATISTIC_URL = reverse('api:statistic')
 
 
