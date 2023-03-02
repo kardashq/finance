@@ -1,17 +1,17 @@
 from datetime import datetime, timedelta
 
 from django.db.models import Sum
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from rest_framework import generics, viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font
-
 
 from .models import Transaction, Account
 from .serializers import AccountSerializer, ActionSerializer, TransactionSerializer
@@ -133,7 +133,7 @@ class MonthlyStatsView(generics.ListAPIView):
                 account__user=self.request.user,
                 type_of_transaction=t,
                 date__range=[start_date, end_date]
-            ).annotate(total=Sum('amount'))
+            )
 
             return stats
         else:
@@ -141,8 +141,7 @@ class MonthlyStatsView(generics.ListAPIView):
             stats = Transaction.objects.filter(
                 account__user=self.request.user,
                 date__range=[start_date, end_date]
-            ).annotate(total=Sum('amount'))
-
+            )
             return stats
 
 
