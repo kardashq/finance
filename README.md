@@ -17,7 +17,7 @@ git clone https://github.com/kardashq/finance.git
 Then you just need to build the images and containers, this is done just once with:
 
 ```bash
-docker-compose up -d
+docker-compose up --build
 ```
 ### Run the App
 
