@@ -101,7 +101,7 @@ DATABASES = {
         'NAME': 'finance_db',
         'USER': os.getenv('DB_USER'),  # .env
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': 'localhost',
+        'HOST': 'finance_db',
         'PORT': '5432',
     }
 }
